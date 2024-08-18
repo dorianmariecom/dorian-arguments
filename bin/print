@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/dorian-arguments"
+
+arguments, options, files, input = Dorian::Arguments.parse(
+  reverse: "boolean",
+  inverse: { type: "boolean", default: false }
+)
+
+puts arguments
+puts "REVERSE" if options.reverse
+puts "INVERSE" if options.inverse
+puts files if files.any?
+puts input if input

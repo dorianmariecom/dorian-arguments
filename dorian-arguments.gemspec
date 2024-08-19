@@ -11,5 +11,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/dorianmariecom/dorian-arguments"
   s.license = "MIT"
   s.metadata = { "rubygems_mfa_required" => "true" }
+  s.add_dependency "activesupport"
+  s.add_dependency "bigdecimal"
   s.add_dependency "dorian-to_struct"
 end

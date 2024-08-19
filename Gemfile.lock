@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     dorian-arguments (0.0.1)
+      activesupport
       dorian-to_struct
 
 GEM

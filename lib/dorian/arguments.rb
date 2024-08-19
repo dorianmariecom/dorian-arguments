@@ -1,8 +1,52 @@
 require "dorian/to_struct"
+require "bigdecimal"
+require "active_support"
+require "active_support/core_ext/string/inflections"
 
 class Dorian
   class Arguments
     attr_reader :definition
+
+    BOOLEAN = "boolean"
+    STRING = "string"
+    NUMBER = "number"
+    INTEGER = "integer"
+    DECIMAL = "decimal"
+
+    DEFAULT_MULTIPLE = false
+    DEFAULT_ALIASES = []
+    DEFAULT_TYPE = BOOLEAN
+
+    TYPES = [
+      BOOLEAN,
+      STRING,
+      NUMBER,
+      INTEGER,
+      DECIMAL
+    ]
+
+    DEFAULTS = {
+      BOOLEAN => "false",
+      STRING => "",
+      NUMBER => "0",
+      INTEGER => "0",
+      DECIMAL => "0"
+    }
+
+    MATCHES = {
+      BOOLEAN => /^(0|1|true|false)$/i,
+      STRING => /^.+$/i,
+      NUMBER => /^[0-9.]+$/i,
+      INTEGER => /^[0-9]+$/i,
+      DECIMAL => /^[0-9]+$/i
+    }
+
+    BOOLEANS = {
+      "0" => false,
+      "1" => true,
+      "true" => true,
+      "false" => false
+    }
 
     def initialize(**definition)
       @definition = definition
@@ -14,51 +58,59 @@ class Dorian
 
     def parse
       arguments = ARGV
+      key_arguments = ARGV.map { |argv| argv.split("=").first }
       options = {}
       files = []
 
       definition.each do |key, value|
         if value.is_a?(Hash)
-          type = value[:type] || "boolean"
-          default = value[:default] || nil
-          aliases = value[:alias] || value[:aliases] || []
+          type = value[:type] || DEFAULT_TYPE
+          default = value[:default] || DEFAULTS.fetch(type)
+          aliases = value[:alias] || value[:aliases] || DEFAULT_ALIASES
         else
           type = value
-          default = nil
-          aliases = []
+          default = DEFAULTS.fetch(type)
+          aliases = DEFAULT_ALIASES
         end
 
-        argument = arguments.detect do |argument|
-          argument = argument.split("=").first
+        keys = ([key] + aliases).map(&:to_s).map(&:parameterize)
+        keys = keys.map { |key| ["--#{key}", "-#{key}"] }.flatten
 
-          ([key] + aliases).any? do |key|
-            argument == "--#{key.to_s}" || argument == "-#{key.to_s}"
+        indexes = []
+
+        values = arguments.map.with_index do |argument, index|
+          if keys.include?(argument.split("=").first)
+            indexes << index
+
+            if argument.include?("=")
+              argument.split("=", 2).last
+            elsif arguments[index + 1].to_s =~ MATCHES.fetch(type)
+              indexes << index + 1
+
+              arguments[index + 1]
+            else
+              default
+            end
           end
+        end.reject(&:nil?)
+
+        if type == BOOLEAN
+          values = values.map { |value| BOOLEANS.fetch(value.downcase) }
         end
 
-        if argument&.include?("=")
-          value = argument.split("=", 2)
-        else
-          value = default
+        if type == INTEGER
+          values = values.map { |value| value.to_i }
         end
 
-        if type == "boolean"
-          if value.to_s.downcase == "true" || value == "1"
-            value = true
-          elsif value.to_s.downcase == "false" || value == "0"
-            value = false
-          elsif value.nil?
-            value = false
-          else
-            abort "#{value} not supported"
-          end
-        else
-          raise NotImplementedError
+        if type == DECIMAL || type == NUMBER
+          values = values.map { |value| BigDecimal(value) }
         end
 
-        arguments -= [argument]
+        values = values.first if values.size < 2
 
-        options[key] = value
+        indexes.sort.reverse.uniq.each { |index| arguments.delete_at(index) }
+
+        options[key] = values || BOOLEANS.fetch(DEFAULTS.fetch(type))
       end
 
       files = arguments.select { |argument| File.exist?(argument) }

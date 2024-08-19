@@ -38,7 +38,7 @@ class Dorian
       STRING => /^.+$/i,
       NUMBER => /^[0-9.]+$/i,
       INTEGER => /^[0-9]+$/i,
-      DECIMAL => /^[0-9]+$/i
+      DECIMAL => /^[0-9.]+$/i
     }
 
     BOOLEANS = {
@@ -87,6 +87,8 @@ class Dorian
               indexes << index + 1
 
               arguments[index + 1]
+            elsif type == BOOLEAN
+              "true"
             else
               default
             end
@@ -106,10 +108,11 @@ class Dorian
         end
 
         values = values.first if values.size < 2
+        values || BOOLEANS.fetch(DEFAULTS.fetch(type)) if type == BOOLEAN
 
         indexes.sort.reverse.uniq.each { |index| arguments.delete_at(index) }
 
-        options[key] = values || BOOLEANS.fetch(DEFAULTS.fetch(type))
+        options[key] = values
       end
 
       files = arguments.select { |argument| File.exist?(argument) }

@@ -58,7 +58,6 @@ class Dorian
 
     def parse
       arguments = ARGV
-      key_arguments = ARGV.map { |argv| argv.split("=").first }
       options = {}
       files = []
 

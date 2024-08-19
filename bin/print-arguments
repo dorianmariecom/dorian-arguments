@@ -3,8 +3,10 @@
 require_relative "../lib/dorian-arguments"
 
 pp Dorian::Arguments.parse(
-     name: "string",
-     count: "integer",
-     size: "decimal",
-     wearing: "boolean"
+     name: :string,
+     count: :integer,
+     size: :decimal,
+     wearing: :boolean,
+     version: { type: :boolean, alias: :v },
+     help: { type: :boolean, alias: :h }
    )

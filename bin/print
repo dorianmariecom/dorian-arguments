@@ -2,16 +2,20 @@
 
 require_relative "../lib/dorian-arguments"
 
-arguments, options, files =
+parsed =
   Dorian::Arguments.parse(
     reverse: "boolean",
     inverse: {
       type: "boolean",
       default: false
-    }
+    },
+    version: { type: :boolean, alias: :v },
+    help: { type: :boolean, alias: :h }
   )
 
-puts arguments
-puts "REVERSE" if options.reverse
-puts "INVERSE" if options.inverse
-puts files if files.any?
+puts parsed.arguments
+puts "REVERSE" if parsed.options.reverse
+puts "INVERSE" if parsed.options.inverse
+puts parsed.files if parsed.files.any?
+puts File.read(File.expand_path('../../VERSION', __FILE__)) if parsed.options.version
+puts parsed.help if parsed.options.help

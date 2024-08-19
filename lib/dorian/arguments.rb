@@ -2,6 +2,7 @@ require "dorian/to_struct"
 require "bigdecimal"
 require "active_support"
 require "active_support/core_ext/string/inflections"
+require "active_support/core_ext/array/wrap"
 
 class Dorian
   class Arguments
@@ -51,15 +52,7 @@ class Dorian
       files = []
 
       definition.each do |key, value|
-        if value.is_a?(Hash)
-          type = value[:type] || DEFAULT_TYPE
-          default = value[:default] || DEFAULTS.fetch(type)
-          aliases = value[:alias] || value[:aliases] || DEFAULT_ALIASES
-        else
-          type = value
-          default = DEFAULTS.fetch(type)
-          aliases = DEFAULT_ALIASES
-        end
+        type, default, aliases = normalize(value)
 
         keys = ([key] + aliases).map(&:to_s).map(&:parameterize)
         keys = keys.map { |key| ["--#{key}", "-#{key}"] }.flatten
@@ -110,7 +103,46 @@ class Dorian
 
       arguments -= files
 
-      [arguments, options.to_struct, files]
+      {
+        arguments:,
+        options:,
+        files:,
+        help:
+      }.to_deep_struct
+    end
+
+    def help
+      message = "USAGE: #{$PROGRAM_NAME}\n"
+
+      message += "\n" if definition.any?
+
+      definition.each do |key, value|
+        type, default, aliases = normalize(value)
+
+        keys_message = ([key] + aliases).map(&:to_s).map(&:parameterize).map do |key|
+          key.size == 1 ? "-#{key}" : "--#{key}"
+        end.join("|")
+
+        message += "  #{keys_message} #{type.upcase}, default: #{default}\n"
+      end
+
+      message
+    end
+
+    def normalize(value)
+      if value.is_a?(Hash)
+        type = value[:type]&.to_s || DEFAULT_TYPE
+        default = value[:default]&.to_s || DEFAULTS.fetch(type)
+        aliases = Array.wrap(
+          value[:alias]&.to_s || value[:aliases]&.map(&:to_s) || DEFAULT_ALIASES
+        )
+      else
+        type = value.to_s
+        default = DEFAULTS.fetch(type)
+        aliases = DEFAULT_ALIASES
+      end
+
+      [type, default, aliases]
     end
   end
 end

@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = s.summary
   s.authors = ["Dorian Marié"]
   s.email = "dorian@dorianmarie.com"
-  s.files = ["lib/dorian-arguments.rb", "lib/dorian/arguments.rb"]
+  s.files = %w[lib/dorian-arguments.rb lib/dorian/arguments.rb]
   s.homepage = "https://github.com/dorianmariecom/dorian-arguments"
   s.license = "MIT"
   s.metadata = { "rubygems_mfa_required" => "true" }

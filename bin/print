@@ -2,10 +2,14 @@
 
 require_relative "../lib/dorian-arguments"
 
-arguments, options, files = Dorian::Arguments.parse(
-  reverse: "boolean",
-  inverse: { type: "boolean", default: false }
-)
+arguments, options, files =
+  Dorian::Arguments.parse(
+    reverse: "boolean",
+    inverse: {
+      type: "boolean",
+      default: false
+    }
+  )
 
 puts arguments
 puts "REVERSE" if options.reverse

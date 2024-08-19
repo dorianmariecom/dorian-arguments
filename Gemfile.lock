@@ -3,6 +3,7 @@ PATH
   specs:
     dorian-arguments (0.0.1)
       activesupport
+      bigdecimal
       dorian-to_struct
 
 GEM

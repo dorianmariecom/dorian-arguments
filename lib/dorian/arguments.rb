@@ -17,13 +17,7 @@ class Dorian
     DEFAULT_ALIASES = []
     DEFAULT_TYPE = BOOLEAN
 
-    TYPES = [
-      BOOLEAN,
-      STRING,
-      NUMBER,
-      INTEGER,
-      DECIMAL
-    ]
+    TYPES = [BOOLEAN, STRING, NUMBER, INTEGER, DECIMAL]
 
     DEFAULTS = {
       BOOLEAN => "false",
@@ -41,12 +35,7 @@ class Dorian
       DECIMAL => /^[0-9.]+$/i
     }
 
-    BOOLEANS = {
-      "0" => false,
-      "1" => true,
-      "true" => true,
-      "false" => false
-    }
+    BOOLEANS = { "0" => false, "1" => true, "true" => true, "false" => false }
 
     def initialize(**definition)
       @definition = definition
@@ -77,31 +66,33 @@ class Dorian
 
         indexes = []
 
-        values = arguments.map.with_index do |argument, index|
-          if keys.include?(argument.split("=").first)
-            indexes << index
+        values =
+          arguments
+            .map
+            .with_index do |argument, index|
+              if keys.include?(argument.split("=").first)
+                indexes << index
 
-            if argument.include?("=")
-              argument.split("=", 2).last
-            elsif arguments[index + 1].to_s =~ MATCHES.fetch(type)
-              indexes << index + 1
+                if argument.include?("=")
+                  argument.split("=", 2).last
+                elsif arguments[index + 1].to_s =~ MATCHES.fetch(type)
+                  indexes << index + 1
 
-              arguments[index + 1]
-            elsif type == BOOLEAN
-              "true"
-            else
-              default
+                  arguments[index + 1]
+                elsif type == BOOLEAN
+                  "true"
+                else
+                  default
+                end
+              end
             end
-          end
-        end.reject(&:nil?)
+            .reject(&:nil?)
 
         if type == BOOLEAN
           values = values.map { |value| BOOLEANS.fetch(value.downcase) }
         end
 
-        if type == INTEGER
-          values = values.map { |value| value.to_i }
-        end
+        values = values.map { |value| value.to_i } if type == INTEGER
 
         if type == DECIMAL || type == NUMBER
           values = values.map { |value| BigDecimal(value) }

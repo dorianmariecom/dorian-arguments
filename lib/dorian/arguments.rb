@@ -1,8 +1,10 @@
 require "dorian/to_struct"
 require "bigdecimal"
+require "bigdecimal/util"
 require "active_support"
 require "active_support/core_ext/string/inflections"
 require "active_support/core_ext/array/wrap"
+require "active_support/core_ext/enumerable"
 
 class Dorian
   class Arguments
@@ -81,21 +83,11 @@ class Dorian
             end
             .reject(&:nil?)
 
-        if type == BOOLEAN
-          values = values.map { |value| BOOLEANS.fetch(value.downcase) }
-        end
-
-        values = values.map { |value| value.to_i } if type == INTEGER
-
-        if type == DECIMAL || type == NUMBER
-          values = values.map { |value| BigDecimal(value) }
-        end
-
-        values = values.first if values.size < 2
-        values || BOOLEANS.fetch(DEFAULTS.fetch(type)) if type == BOOLEAN
-
         indexes.sort.reverse.uniq.each { |index| arguments.delete_at(index) }
 
+        values = [DEFAULTS.fetch(type)] if values.empty?
+        values = values.map { |value| cast(type, value) }
+        values = values.first unless values.many?
         options[key] = values
       end
 
@@ -104,6 +96,18 @@ class Dorian
       arguments -= files
 
       { arguments:, options:, files:, help: }.to_deep_struct
+    end
+
+    def cast(type, value)
+      if type == BOOLEAN
+        BOOLEANS.fetch(value.downcase)
+      elsif type == INTEGER
+        value.to_i
+      elsif type == DECIMAL || type == NUMBER
+        value.to_d
+      else
+        value
+      end
     end
 
     def help
@@ -121,7 +125,7 @@ class Dorian
             .map { |key| key.size == 1 ? "-#{key}" : "--#{key}" }
             .join("|")
 
-        message += "  #{keys_message} #{type.upcase}, default: #{default}\n"
+        message += "  #{keys_message} #{type.upcase}, default: #{cast(type, default).inspect}\n"
       end
 
       message

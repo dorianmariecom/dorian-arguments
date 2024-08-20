@@ -103,12 +103,7 @@ class Dorian
 
       arguments -= files
 
-      {
-        arguments:,
-        options:,
-        files:,
-        help:
-      }.to_deep_struct
+      { arguments:, options:, files:, help: }.to_deep_struct
     end
 
     def help
@@ -119,9 +114,12 @@ class Dorian
       definition.each do |key, value|
         type, default, aliases = normalize(value)
 
-        keys_message = ([key] + aliases).map(&:to_s).map(&:parameterize).map do |key|
-          key.size == 1 ? "-#{key}" : "--#{key}"
-        end.join("|")
+        keys_message =
+          ([key] + aliases)
+            .map(&:to_s)
+            .map(&:parameterize)
+            .map { |key| key.size == 1 ? "-#{key}" : "--#{key}" }
+            .join("|")
 
         message += "  #{keys_message} #{type.upcase}, default: #{default}\n"
       end
@@ -133,9 +131,11 @@ class Dorian
       if value.is_a?(Hash)
         type = value[:type]&.to_s || DEFAULT_TYPE
         default = value[:default]&.to_s || DEFAULTS.fetch(type)
-        aliases = Array.wrap(
-          value[:alias]&.to_s || value[:aliases]&.map(&:to_s) || DEFAULT_ALIASES
-        )
+        aliases =
+          Array.wrap(
+            value[:alias]&.to_s || value[:aliases]&.map(&:to_s) ||
+              DEFAULT_ALIASES
+          )
       else
         type = value.to_s
         default = DEFAULTS.fetch(type)

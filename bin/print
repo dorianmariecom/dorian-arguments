@@ -9,13 +9,21 @@ parsed =
       type: "boolean",
       default: false
     },
-    version: { type: :boolean, alias: :v },
-    help: { type: :boolean, alias: :h }
+    version: {
+      type: :boolean,
+      alias: :v
+    },
+    help: {
+      type: :boolean,
+      alias: :h
+    }
   )
 
 puts parsed.arguments
 puts "REVERSE" if parsed.options.reverse
 puts "INVERSE" if parsed.options.inverse
 puts parsed.files if parsed.files.any?
-puts File.read(File.expand_path('../../VERSION', __FILE__)) if parsed.options.version
+if parsed.options.version
+  puts File.read(File.expand_path("../../VERSION", __FILE__))
+end
 puts parsed.help if parsed.options.help

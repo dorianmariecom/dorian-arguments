@@ -7,6 +7,12 @@ pp Dorian::Arguments.parse(
      count: :integer,
      size: :decimal,
      wearing: :boolean,
-     version: { type: :boolean, alias: :v },
-     help: { type: :boolean, alias: :h }
+     version: {
+       type: :boolean,
+       alias: :v
+     },
+     help: {
+       type: :boolean,
+       alias: :h
+     }
    )

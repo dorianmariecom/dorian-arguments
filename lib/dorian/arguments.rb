@@ -125,7 +125,8 @@ class Dorian
             .map { |key| key.size == 1 ? "-#{key}" : "--#{key}" }
             .join("|")
 
-        message += "  #{keys_message} #{type.upcase}, default: #{cast(type, default).inspect}\n"
+        message +=
+          "  #{keys_message} #{type.upcase}, default: #{cast(type, default).inspect}\n"
       end
 
       message

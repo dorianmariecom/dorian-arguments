@@ -31,14 +31,14 @@ class Dorian
     }
 
     MATCHES = {
-      BOOLEAN => /^(0|1|true|false)$/i,
+      BOOLEAN => /^(true|false)$/i,
       STRING => /^.+$/i,
       NUMBER => /^[0-9.]+$/i,
       INTEGER => /^[0-9]+$/i,
       DECIMAL => /^[0-9.]+$/i
     }
 
-    BOOLEANS = { "0" => false, "1" => true, "true" => true, "false" => false }
+    BOOLEANS = { "true" => true, "false" => false }
 
     def initialize(**definition)
       @definition = definition

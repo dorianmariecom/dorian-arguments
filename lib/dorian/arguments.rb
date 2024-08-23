@@ -74,6 +74,8 @@ class Dorian
                   indexes << index + 1
 
                   arguments[index + 1]
+                elsif type == BOOLEAN
+                  "true"
                 else
                   default
                 end

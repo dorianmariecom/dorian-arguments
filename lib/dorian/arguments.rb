@@ -74,8 +74,6 @@ class Dorian
                   indexes << index + 1
 
                   arguments[index + 1]
-                elsif type == BOOLEAN
-                  "true"
                 else
                   default
                 end
@@ -85,7 +83,7 @@ class Dorian
 
         indexes.sort.reverse.uniq.each { |index| arguments.delete_at(index) }
 
-        values = [DEFAULTS.fetch(type)] if values.empty?
+        values = [default] if values.empty?
         values = values.map { |value| cast(type, value) }
         values = values.first unless values.many?
         options[key] = values

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dorian-arguments (1.0.0)
+    dorian-arguments (1.0.1)
       activesupport
       bigdecimal
       dorian-to_struct

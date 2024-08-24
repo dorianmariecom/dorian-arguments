@@ -22,13 +22,7 @@ class Dorian
 
     TYPES = [BOOLEAN, STRING, NUMBER, INTEGER, DECIMAL]
 
-    DEFAULTS = {
-      BOOLEAN => "false",
-      STRING => "",
-      NUMBER => "0",
-      INTEGER => "0",
-      DECIMAL => "0"
-    }
+    DEFAULT = nil
 
     MATCHES = {
       BOOLEAN => /^(true|false)$/i,
@@ -99,7 +93,9 @@ class Dorian
     end
 
     def cast(type, value)
-      if type == BOOLEAN
+      if value.nil?
+        nil
+      elsif type == BOOLEAN
         BOOLEANS.fetch(value.downcase)
       elsif type == INTEGER
         value.to_i
@@ -135,7 +131,7 @@ class Dorian
     def normalize(value)
       if value.is_a?(Hash)
         type = value[:type]&.to_s || DEFAULT_TYPE
-        default = value[:default]&.to_s || DEFAULTS.fetch(type)
+        default = value[:default]&.to_s || DEFAULT
         aliases =
           Array.wrap(
             value[:alias]&.to_s || value[:aliases]&.map(&:to_s) ||
@@ -143,7 +139,7 @@ class Dorian
           )
       else
         type = value.to_s
-        default = DEFAULTS.fetch(type)
+        default = DEFAULT
         aliases = DEFAULT_ALIASES
       end
 

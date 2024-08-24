@@ -6,12 +6,8 @@ pp Dorian::Arguments.parse(
      name: :string,
      count: :integer,
      size: :decimal,
-     wearing: {
-       default: true
-     },
-     not_wearing: {
-       default: "true"
-     },
+     wearing: :boolean,
+     not_wearing: :boolean,
      version: {
        type: :boolean,
        alias: :v

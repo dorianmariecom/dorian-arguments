@@ -1,10 +1,5 @@
-require "dorian/to_struct"
 require "bigdecimal"
 require "bigdecimal/util"
-require "active_support"
-require "active_support/core_ext/string/inflections"
-require "active_support/core_ext/array/wrap"
-require "active_support/core_ext/enumerable"
 
 class Dorian
   class Arguments
@@ -50,7 +45,7 @@ class Dorian
       definition.each do |key, value|
         type, default, aliases = normalize(value)
 
-        keys = ([key] + aliases).map(&:to_s).map(&:parameterize)
+        keys = ([key] + aliases).map(&:to_s).map { |key| parameterize(key) }
         keys = keys.map { |key| ["--#{key}", "-#{key}"] }.flatten
 
         indexes = []
@@ -81,7 +76,7 @@ class Dorian
 
         values = [default] if values.empty?
         values = values.map { |value| cast(type, value) }
-        values = values.first unless values.many?
+        values = values.first unless many?(values)
         options[key] = values
       end
 
@@ -89,7 +84,11 @@ class Dorian
 
       arguments -= files
 
-      { arguments:, options:, files:, help: }.to_deep_struct
+      options = Struct.new(*options.keys).new(*options.values)
+
+      Struct.new(:arguments, :options, :files, :help).new(
+        arguments, options, files, help
+      )
     end
 
     def cast(type, value)
@@ -117,7 +116,7 @@ class Dorian
         keys_message =
           ([key] + aliases)
             .map(&:to_s)
-            .map(&:parameterize)
+            .map { |key| parameterize(key) }
             .map { |key| key.size == 1 ? "-#{key}" : "--#{key}" }
             .join("|")
 
@@ -128,12 +127,25 @@ class Dorian
       message
     end
 
+    def many?(array)
+      array.size > 1
+    end
+
+    def parameterize(string, separator: "-")
+      string
+        .to_s
+        .encode("ASCII", invalid: :replace, undef: :replace, replace: "")
+        .downcase
+        .gsub(/[^a-z0-9]+/, separator)
+        .gsub(/^#{separator}+|#{separator}+$/, "")
+    end
+
     def normalize(value)
       if value.is_a?(Hash)
         type = value[:type]&.to_s || DEFAULT_TYPE
         default = value[:default]&.to_s || DEFAULT
         aliases =
-          Array.wrap(
+          Array(
             value[:alias]&.to_s || value[:aliases]&.map(&:to_s) ||
               DEFAULT_ALIASES
           )

@@ -87,7 +87,10 @@ class Dorian
       options = Struct.new(*options.keys).new(*options.values)
 
       Struct.new(:arguments, :options, :files, :help).new(
-        arguments, options, files, help
+        arguments,
+        options,
+        files,
+        help
       )
     end
 

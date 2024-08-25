@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "bigdecimal"
 require "bigdecimal/util"
 
@@ -12,10 +14,10 @@ class Dorian
     DECIMAL = "decimal"
 
     DEFAULT_MULTIPLE = false
-    DEFAULT_ALIASES = []
+    DEFAULT_ALIASES = [].freeze
     DEFAULT_TYPE = BOOLEAN
 
-    TYPES = [BOOLEAN, STRING, NUMBER, INTEGER, DECIMAL]
+    TYPES = [BOOLEAN, STRING, NUMBER, INTEGER, DECIMAL].freeze
 
     DEFAULT = nil
 
@@ -25,9 +27,9 @@ class Dorian
       NUMBER => /^[0-9.]+$/i,
       INTEGER => /^[0-9]+$/i,
       DECIMAL => /^[0-9.]+$/i
-    }
+    }.freeze
 
-    BOOLEANS = { "true" => true, "false" => false }
+    BOOLEANS = { "true" => true, "false" => false }.freeze
 
     def initialize(**definition)
       @definition = definition
@@ -40,7 +42,6 @@ class Dorian
     def parse
       arguments = ARGV
       options = {}
-      files = []
 
       definition.each do |key, value|
         type, default, aliases = normalize(value)
@@ -59,7 +60,7 @@ class Dorian
 
                 if argument.include?("=")
                   argument.split("=", 2).last
-                elsif arguments[index + 1].to_s =~ MATCHES.fetch(type)
+                elsif arguments[index + 1].to_s&.match?(MATCHES.fetch(type))
                   indexes << index + 1
 
                   arguments[index + 1]
@@ -101,7 +102,7 @@ class Dorian
         BOOLEANS.fetch(value.downcase)
       elsif type == INTEGER
         value.to_i
-      elsif type == DECIMAL || type == NUMBER
+      elsif [DECIMAL, NUMBER].include?(type)
         value.to_d
       else
         value

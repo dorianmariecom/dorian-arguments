@@ -110,7 +110,7 @@ class Dorian
     end
 
     def help
-      message = "USAGE: #{$PROGRAM_NAME}\n"
+      message = "USAGE: #{File.basename($PROGRAM_NAME)}\n"
 
       message += "\n" if definition.any?
 

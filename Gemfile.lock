@@ -49,7 +49,7 @@ GEM
       terminal-table
       w_syntax_tree-erb
       yaml
-    dorian-eval (1.4.3)
+    dorian-eval (1.5.0)
       yaml
     dorian-progress (1.1.2)
       ruby-progressbar

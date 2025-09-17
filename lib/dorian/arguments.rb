@@ -60,7 +60,7 @@ class Dorian
 
                 if argument.include?("=")
                   argument.split("=", 2).last
-                elsif arguments[index + 1].to_s&.match?(MATCHES.fetch(type))
+                elsif arguments[index + 1].to_s.match?(MATCHES.fetch(type))
                   indexes << (index + 1)
 
                   arguments[index + 1]

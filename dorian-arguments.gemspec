@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
   s.license = "MIT"
   s.metadata = { "rubygems_mfa_required" => "true" }
   s.add_dependency "bigdecimal", ">= 3.1", "< 5"
-  s.required_ruby_version = ">= 3.0"
+  s.required_ruby_version = ">= 4.0"
 end

@@ -1,39 +1,40 @@
-# `dorian-to_struct`
+# `dorian-arguments`
 
-Adds `#to_struct` and `#to_deep_struct` to Hash and Array
+Small command-line argument parser used by the Dorian tools.
 
-### Install
+## Install
 
 ```bash
-gem install dorian-to_struct
+gem install dorian-arguments
 ```
 
-Then: `require "dorian/to_struct"`
+Also included in the aggregate gem:
 
-Or in your `Gemfile`:
-
-```
-gem "dorian-to_struct"
+```bash
+gem install dorian
 ```
 
-### Usage
+## Usage
 
+```bash
+arguments -h
 ```
-user = {
-  first_name: "Dorian",
-  last_name: "Marié"
-}.to_struct
 
-user.first_name # => "Dorian"
-user.last_name # => "Marié"
-user.birtdate # NoMethodError
+Run `arguments -h` for generated option details and `arguments -v` for the installed version.
 
-event = {
-  name: "Party",
-  organizer: {
-    first_name: "Dorian"
-  }
-}.to_deep_struct
+## Notes
 
-event.organizer.first_name # => "Dorian"
+- Use `Dorian::Arguments.parse` to split positional arguments, existing file paths, and typed options into one struct.
+
+## Examples
+
+### Parse options in Ruby
+
+```ruby
+require "dorian/arguments"
+
+parsed = Dorian::Arguments.parse(count: :integer, verbose: :boolean)
+parsed.arguments
+parsed.options.count
+parsed.files
 ```
